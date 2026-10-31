@@ -108,21 +108,21 @@ There are still two leaders, the two drones farthest apart, and the sensing grap
 
 Large formations start close to their shape, within 10 cm in each axis, so these flights show that the shape is held while moving and not that it forms from far away. The drones first climb straight up to 2.5 m and then go to their place at the same time, on straight lines chosen so that they stay apart. The landing does the same in reverse.
 
-The values use the metric of the paper after the first 30 s, in flights of 60 s without wind. STA uses other gains here than in the formation of the paper, tuned on the pyramid of 30 drones and the letters. The STA values are from 2 flights, and the PD values from 2 flights.
+The values use the metric of the paper after the first 30 s, in flights of 60 s without wind. STA uses other gains here than in the formation of the paper, tuned on the pyramid of 30 drones and the letters. The values are the mean of 2 flights of each controller.
 
 | Formation | Drones | PD median | STA median | Smallest distance, PD [m] | Smallest distance, STA [m] |
 |---|---|---|---|---|---|
-| Pyramid, 3 levels | 14 | 0.0220 | 0.0076 | 1.35 | 1.42 |
-| Pyramid, 4 levels | 30 | 0.0400 | 0.0130 | 0.94 | 1.14 |
-| Letters CCE | 44 | 0.0320 | 0.0231 | 1.32 | 0.57 |
-| Pyramid, 5 levels | 55 | 0.0347 | 0.0248 | 0.90 | 1.01 |
-| Pyramid, 6 levels | 91 | 0.0355 | 0.0355 | 0.83 | 1.03 |
+| Pyramid, 3 levels | 14 | 0.0189 | 0.0066 | 1.35 | 1.42 |
+| Pyramid, 4 levels | 30 | 0.0342 | 0.0117 | 0.94 | 1.14 |
+| Letters CCE | 44 | 0.0267 | 0.0194 | 1.32 | 0.57 |
+| Pyramid, 5 levels | 55 | 0.0306 | 0.0216 | 0.90 | 1.01 |
+| Pyramid, 6 levels | 91 | 0.0306 | 0.0283 | 0.83 | 1.03 |
 
-STA has the lower error up to 55 drones, and both are the same with 91.
+STA has the lower error in all of them, and the difference is smallest with 91 drones.
 
 **How long it takes.** Gazebo slows down with more drones, measured without flying: 0.76× real time with 25 drones, 0.40× with 50 and 0.20× with 100, on an Intel i7-14650HX. Everything runs on the simulated clock, so slower does not change the flight, only how long you wait. Use `--headless` with many drones, because the Gazebo window was not tested with them.
 
-**Spacing.** The laws scale with the inverse of the distance. In one flight each with the pyramid of 30 drones and the letters at 0.8 m, STA stayed at a median of 0.016 and 0.021, and PD rose to 0.194 and 0.164, so use 1.6 m with PD.
+**Spacing.** The laws scale with the inverse of the distance. In one flight each with the pyramid of 30 drones and the letters at 0.8 m, STA stayed at a median of 0.015 and 0.018, and PD rose to 0.159 and 0.154, so use 1.6 m with PD.
 
 ## Differences from the paper
 

@@ -220,7 +220,7 @@ class Formation:
             np.add.at(step, a, -k[:, 2] * sign * dt)
             self.nu = np.clip(self.nu + step, -NU_LIMIT, NU_LIMIT)
             np.add.at(accel, a, self.nu[a] - k[:, 1] * np.sqrt(np.abs(s)) * sign)
-        return accel, errors
+        return accel, e
 
     def step(self):
         with self.lock:
