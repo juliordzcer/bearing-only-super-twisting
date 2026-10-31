@@ -13,3 +13,7 @@ Copyright 2026 Julio Cesar Rodriguez. Credit him when you use or adapt the model
 If you use this code in academic work, please cite both the paper and this
 repository, as listed in CITATION.cff. This repository is based on the simulation of that paper, but it
 uses a different drone and different code. See README.md for the differences.
+
+Tree models:
+  models/oak_tree, models/pine_tree  Oak tree and Pine Tree from Gazebo Fuel, by
+  Open Robotics (Louise Poubel), CC0 1.0. Collisions removed.
