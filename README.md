@@ -79,14 +79,14 @@ Each one takes about 75 s, prints the minimum, median and maximum of the bearing
 
 ## Results
 
-The metric is the one in the paper, measured after the first 30 s of automatic mode. Values are from 2 flights of each controller at scale 0.5, and the two flights differ by less than 0.002.
+The metric is the one in the paper, measured after the first 30 s of automatic mode. Values are from 4 flights of each controller at scale 0.5, and the flights of a controller differ by less than 0.0002.
 
 | Controller | Minimum | Median | Maximum | Smallest distance between drones [m] |
 |---|---|---|---|---|
-| PD | 0.0061 | 0.0205 | 0.0342 | 0.41 |
-| STA | 0.0183 | 0.0348 | 0.0530 | 0.20 |
+| PD | 0.0032 | 0.0143 | 0.0220 | 0.39 |
+| STA | 0.0053 | 0.0078 | 0.0146 | 0.41 |
 
-These do not reproduce the paper, where STA has the lower error (median 0.0036 against 0.0081). Here both controllers were tuned for this drone, and the PD has the lower error. The velocity loop of the drone firmware is between these laws and the motors, and it does not exist in the same form on the Bebop 2 model of the paper.
+STA has the lower median and maximum error, as in the paper, where the medians are 0.0036 for STA and 0.0081 for PD. The values are not the same, because this is another drone and scale, and the velocity loop of the firmware is between these laws and the motors.
 
 ## Differences from the paper
 
@@ -97,6 +97,7 @@ These do not reproduce the paper, where STA has the lower error (median 0.0036 a
 | Measurement | Bearings from the simulated poses | The same |
 | Low-level control | Velocity interface of the model | Position, velocity and attitude loops of the drone firmware |
 | Bearing rate | From the simulated velocities | From the poses, numerically differentiated and filtered |
+| Sign in the STA law | Exact sign | Smooth sign, because the exact one makes a limit cycle of about 1.2 Hz with the velocity loop of the firmware |
 | Gains | Table of the paper | Tuned in flight for this drone and scale |
 | Simulator | Gazebo Ionic and ROS Rolling | Gazebo Harmonic, without ROS |
 

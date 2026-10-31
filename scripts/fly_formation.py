@@ -59,8 +59,9 @@ EDGES = [(3, 2), (3, 4), (4, 5), (4, 1), (4, 2), (5, 4), (5, 1), (5, 10), (6, 10
 # Gains per axis (x and y, z), tuned in flight for this drone and scale. The STA law
 # has k0, k1, k2 and the PD law has k0, k1.
 GAINS = {
-    'sta': {'xy': (0.29439, 0.39197, 0.00020695), 'z': (0.18682, 0.1075, 0.0013275)},
-    'pd': {'xy': (0.62039, 0.78873), 'z': (5.60651, 1.1358)},
+    'sta': {'xy': (0.40401, 0.30322, 0.00034431), 'z': (0.93109, 0.75493, 0.045843),
+            'boundary': 0.0286},
+    'pd': {'xy': (0.20042, 1.2183), 'z': (0.716, 2.7416)},
 }
 
 
@@ -218,9 +219,11 @@ class Formation:
                     accel[a, axis] += k[0] * e[axis] + k[1] * g_rate[axis]
                 else:
                     s = -g_rate[axis] - k[0] * e[axis]
-                    self.nu[a, axis] = np.clip(self.nu[a, axis] - k[2] * np.sign(s) * dt,
+                    # A smooth sign: the exact one makes a limit cycle with the velocity loop.
+                    sign = math.tanh(s / self.gains['boundary'])
+                    self.nu[a, axis] = np.clip(self.nu[a, axis] - k[2] * sign * dt,
                                                -NU_LIMIT, NU_LIMIT)
-                    accel[a, axis] += self.nu[a, axis] - k[1] * math.sqrt(abs(s)) * np.sign(s)
+                    accel[a, axis] += self.nu[a, axis] - k[1] * math.sqrt(abs(s)) * sign
         return accel, np.array(errors)
 
     def step(self):
