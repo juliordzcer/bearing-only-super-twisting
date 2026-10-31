@@ -104,7 +104,7 @@ python3 scripts/fly_formation.py --controller sta --formation pyramid --levels 4
 python3 scripts/fly_formation.py --controller sta --formation letters --text CCE
 ```
 
-There are still two leaders, the two drones farthest apart, and the sensing graph is generated: each drone sees its nearest neighbors, and short edges are added until the bearings and the leaders fix every follower, with the smallest eigenvalue of the follower bearing Laplacian at 0.06 or more. Each drone keeps only about 4 to 7 neighbors.
+There are still two leaders, the two drones farthest apart, and the sensing graph is generated: each drone sees its nearest neighbors, and short edges are added until the bearings and the leaders fix every follower, with the smallest eigenvalue of the follower bearing Laplacian at 0.06 or more. Each drone sees about 4 to 7 neighbors on average.
 
 Large formations start close to their shape, within 10 cm in each axis, so these flights show that the shape is held while moving and not that it forms from far away. The drones first climb straight up to 2.5 m and then go to their place at the same time, on straight lines chosen so that they stay apart. The landing does the same in reverse.
 
@@ -122,7 +122,7 @@ STA has the lower error up to 55 drones, and both are the same with 91.
 
 **How long it takes.** Gazebo slows down with more drones, measured without flying: 0.76× real time with 25 drones, 0.40× with 50 and 0.20× with 100, on an Intel i7-14650HX. Everything runs on the simulated clock, so slower does not change the flight, only how long you wait. Use `--headless` with many drones, because the Gazebo window was not tested with them.
 
-**Spacing.** Keep neighbors at about 1.6 m. The laws scale with the inverse of the distance, so with 0.8 m and these gains the drones oscillate.
+**Spacing.** The laws scale with the inverse of the distance. In one flight each with the pyramid of 30 drones and the letters at 0.8 m, STA stayed at a median of 0.016 and 0.021, and PD rose to 0.194 and 0.164, so use 1.6 m with PD.
 
 ## Differences from the paper
 
