@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite both the paper and this repository."
+title: "CCE 2025 Bearing-Only Super-Twisting Simulation"
+type: software
+repository-code: "https://github.com/juliordzcer/cce2025-bearing-only-sta"
+license: Apache-2.0
+authors:
+  - family-names: "Rodriguez"
+    given-names: "Julio Cesar"
+    email: "contact@juliordz.com"
+preferred-citation:
+  type: conference-paper
+  title: "Bearing-Only Super-Twisting Control for Multi-Quadrotor Formations"
+  authors:
+    - family-names: "López Ruiz"
+      given-names: "Frida G."
+    - family-names: "Rodríguez"
+      given-names: "Julio César"
+    - family-names: "Becerra"
+      given-names: "Héctor M."
+    - family-names: "Ruiz León"
+      given-names: "Javier"
+  collection-title: "2025 22nd International Conference on Electrical Engineering, Computing Science and Automatic Control (CCE)"
+  year: 2025
+  start: 1
+  end: 6
+  url: "https://ieeexplore.ieee.org/document/11272041"

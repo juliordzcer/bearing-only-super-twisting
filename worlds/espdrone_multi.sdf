@@ -1,0 +1,853 @@
+<?xml version="1.0" ?>
+<!-- Copyright 2026 Julio Cesar Rodriguez <contact@juliordz.com> -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<sdf version="1.9">
+  <world name="espdrone_multi">
+
+    <physics name="ode_physics" type="ode">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>500</real_time_update_rate>
+      <ode>
+        <solver>
+          <type>world</type>
+          <iters>10</iters>
+          <sor>1.0</sor>
+        </solver>
+        <constraints>
+          <cfm>0.00001</cfm>
+          <erp>0.8</erp>
+        </constraints>
+      </ode>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-sensors-system"
+            name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <scene>
+      <ambient>0.62 0.62 0.62 1</ambient>
+      <background>0.62 0.78 0.92 1</background>
+      <grid>false</grid>
+      <shadows>true</shadows>
+    </scene>
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 50 0.1 0.3 -0.9</pose>
+      <diffuse>0.95 0.95 0.95 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <attenuation>
+        <range>500</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+    </light>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>200 200</size></plane>
+          </geometry>
+          <surface>
+            <friction><ode><mu>100</mu><mu2>50</mu2></ode></friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane><normal>0 0 1</normal><size>200 200</size></plane>
+          </geometry>
+          <material>
+            <ambient>0.34 0.47 0.29 1</ambient>
+            <diffuse>0.34 0.47 0.29 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ═══════════ ESP-Drone 1 (leader) — x=0.4, y=0.4 ═══════════ -->
+    <include>
+      <uri>model://espdrone</uri>
+      <name>espdrone1</name>
+      <pose>0.4 0.4 0.3 0 0 0</pose>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone1</robotNamespace>
+        <jointName>propeller_fr_joint</jointName>
+        <linkName>propeller_fr</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>0</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone1</robotNamespace>
+        <jointName>propeller_rr_joint</jointName>
+        <linkName>propeller_rr</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>1</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone1</robotNamespace>
+        <jointName>propeller_rl_joint</jointName>
+        <linkName>propeller_rl</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>2</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone1</robotNamespace>
+        <jointName>propeller_fl_joint</jointName>
+        <linkName>propeller_fl</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>3</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPowerDistribution" filename="libEspPowerDistribution.so">
+        <robotNamespace>espdrone1</robotNamespace>
+      </plugin>
+      <plugin name="gz::sim::systems::EspAttitudeController" filename="libEspAttitudeController.so">
+        <robotNamespace>espdrone1</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <rollRate_kp>17.8343</rollRate_kp>  <rollRate_ki>0.0</rollRate_ki>  <rollRate_kd>0.5251</rollRate_kd>
+        <pitchRate_kp>17.8343</pitchRate_kp> <pitchRate_ki>0.0</pitchRate_ki> <pitchRate_kd>0.5251</pitchRate_kd>
+        <yawRate_kp>8.9171</yawRate_kp>      <yawRate_ki>0.0</yawRate_ki>     <yawRate_kd>0.2626</yawRate_kd>
+        <roll_kp>6.5417</roll_kp>            <roll_ki>0.0</roll_ki>           <roll_kd>0.2641</roll_kd>
+        <pitch_kp>6.5417</pitch_kp>          <pitch_ki>0.0</pitch_ki>         <pitch_kd>0.2641</pitch_kd>
+        <yaw_kp>3.2708</yaw_kp>              <yaw_ki>0.0</yaw_ki>             <yaw_kd>0.1320</yaw_kd>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPositionController" filename="libEspPositionController.so">
+        <robotNamespace>espdrone1</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <posX_kp>4.1179</posX_kp> <posX_ki>0.7049</posX_ki> <posX_kd>0.5155</posX_kd>
+        <posY_kp>4.1179</posY_kp> <posY_ki>0.7049</posY_ki> <posY_kd>0.5155</posY_kd>
+        <posZ_kp>1.60</posZ_kp>   <posZ_ki>0.50</posZ_ki>   <posZ_kd>0.00</posZ_kd>
+        <velX_kp>35.6977</velX_kp> <velX_ki>1.5104</velX_ki> <velX_kd>1.0162</velX_kd>
+        <velY_kp>35.6977</velY_kp> <velY_ki>1.5104</velY_ki> <velY_kd>1.0162</velY_kd>
+        <velZ_kp>22.0</velZ_kp>    <velZ_ki>15.0</velZ_ki>   <velZ_kd>0.00</velZ_kd>
+      </plugin>
+    </include>
+
+    <!-- ═══════════ ESP-Drone 2 (leader) — x=-0.4, y=0.4 ═══════════ -->
+    <include>
+      <uri>model://espdrone</uri>
+      <name>espdrone2</name>
+      <pose>-0.4 0.4 0.3 0 0 0</pose>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone2</robotNamespace>
+        <jointName>propeller_fr_joint</jointName>
+        <linkName>propeller_fr</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>0</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone2</robotNamespace>
+        <jointName>propeller_rr_joint</jointName>
+        <linkName>propeller_rr</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>1</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone2</robotNamespace>
+        <jointName>propeller_rl_joint</jointName>
+        <linkName>propeller_rl</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>2</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone2</robotNamespace>
+        <jointName>propeller_fl_joint</jointName>
+        <linkName>propeller_fl</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>3</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPowerDistribution" filename="libEspPowerDistribution.so">
+        <robotNamespace>espdrone2</robotNamespace>
+      </plugin>
+      <plugin name="gz::sim::systems::EspAttitudeController" filename="libEspAttitudeController.so">
+        <robotNamespace>espdrone2</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <rollRate_kp>17.8343</rollRate_kp>  <rollRate_ki>0.0</rollRate_ki>  <rollRate_kd>0.5251</rollRate_kd>
+        <pitchRate_kp>17.8343</pitchRate_kp> <pitchRate_ki>0.0</pitchRate_ki> <pitchRate_kd>0.5251</pitchRate_kd>
+        <yawRate_kp>8.9171</yawRate_kp>      <yawRate_ki>0.0</yawRate_ki>     <yawRate_kd>0.2626</yawRate_kd>
+        <roll_kp>6.5417</roll_kp>            <roll_ki>0.0</roll_ki>           <roll_kd>0.2641</roll_kd>
+        <pitch_kp>6.5417</pitch_kp>          <pitch_ki>0.0</pitch_ki>         <pitch_kd>0.2641</pitch_kd>
+        <yaw_kp>3.2708</yaw_kp>              <yaw_ki>0.0</yaw_ki>             <yaw_kd>0.1320</yaw_kd>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPositionController" filename="libEspPositionController.so">
+        <robotNamespace>espdrone2</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <posX_kp>4.1179</posX_kp> <posX_ki>0.7049</posX_ki> <posX_kd>0.5155</posX_kd>
+        <posY_kp>4.1179</posY_kp> <posY_ki>0.7049</posY_ki> <posY_kd>0.5155</posY_kd>
+        <posZ_kp>1.60</posZ_kp>   <posZ_ki>0.50</posZ_ki>   <posZ_kd>0.00</posZ_kd>
+        <velX_kp>35.6977</velX_kp> <velX_ki>1.5104</velX_ki> <velX_kd>1.0162</velX_kd>
+        <velY_kp>35.6977</velY_kp> <velY_ki>1.5104</velY_ki> <velY_kd>1.0162</velY_kd>
+        <velZ_kp>22.0</velZ_kp>    <velZ_ki>15.0</velZ_ki>   <velZ_kd>0.00</velZ_kd>
+      </plugin>
+    </include>
+
+    <!-- ═══════════ ESP-Drone 3 (follower) — x=0.0, y=0.0 ═══════════ -->
+    <include>
+      <uri>model://espdrone</uri>
+      <name>espdrone3</name>
+      <pose>0.0 0.0 0.3 0 0 0</pose>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone3</robotNamespace>
+        <jointName>propeller_fr_joint</jointName>
+        <linkName>propeller_fr</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>0</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone3</robotNamespace>
+        <jointName>propeller_rr_joint</jointName>
+        <linkName>propeller_rr</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>1</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone3</robotNamespace>
+        <jointName>propeller_rl_joint</jointName>
+        <linkName>propeller_rl</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>2</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone3</robotNamespace>
+        <jointName>propeller_fl_joint</jointName>
+        <linkName>propeller_fl</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>3</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPowerDistribution" filename="libEspPowerDistribution.so">
+        <robotNamespace>espdrone3</robotNamespace>
+      </plugin>
+      <plugin name="gz::sim::systems::EspAttitudeController" filename="libEspAttitudeController.so">
+        <robotNamespace>espdrone3</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <rollRate_kp>17.8343</rollRate_kp>  <rollRate_ki>0.0</rollRate_ki>  <rollRate_kd>0.5251</rollRate_kd>
+        <pitchRate_kp>17.8343</pitchRate_kp> <pitchRate_ki>0.0</pitchRate_ki> <pitchRate_kd>0.5251</pitchRate_kd>
+        <yawRate_kp>8.9171</yawRate_kp>      <yawRate_ki>0.0</yawRate_ki>     <yawRate_kd>0.2626</yawRate_kd>
+        <roll_kp>6.5417</roll_kp>            <roll_ki>0.0</roll_ki>           <roll_kd>0.2641</roll_kd>
+        <pitch_kp>6.5417</pitch_kp>          <pitch_ki>0.0</pitch_ki>         <pitch_kd>0.2641</pitch_kd>
+        <yaw_kp>3.2708</yaw_kp>              <yaw_ki>0.0</yaw_ki>             <yaw_kd>0.1320</yaw_kd>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPositionController" filename="libEspPositionController.so">
+        <robotNamespace>espdrone3</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <posX_kp>4.1179</posX_kp> <posX_ki>0.7049</posX_ki> <posX_kd>0.5155</posX_kd>
+        <posY_kp>4.1179</posY_kp> <posY_ki>0.7049</posY_ki> <posY_kd>0.5155</posY_kd>
+        <posZ_kp>1.60</posZ_kp>   <posZ_ki>0.50</posZ_ki>   <posZ_kd>0.00</posZ_kd>
+        <velX_kp>35.6977</velX_kp> <velX_ki>1.5104</velX_ki> <velX_kd>1.0162</velX_kd>
+        <velY_kp>35.6977</velY_kp> <velY_ki>1.5104</velY_ki> <velY_kd>1.0162</velY_kd>
+        <velZ_kp>22.0</velZ_kp>    <velZ_ki>15.0</velZ_ki>   <velZ_kd>0.00</velZ_kd>
+      </plugin>
+    </include>
+
+    <!-- ═══════════ ESP-Drone 4 (follower) — x=-0.4, y=-0.4 ═══════════ -->
+    <include>
+      <uri>model://espdrone</uri>
+      <name>espdrone4</name>
+      <pose>-0.4 -0.4 0.3 0 0 0</pose>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone4</robotNamespace>
+        <jointName>propeller_fr_joint</jointName>
+        <linkName>propeller_fr</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>0</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone4</robotNamespace>
+        <jointName>propeller_rr_joint</jointName>
+        <linkName>propeller_rr</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>1</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone4</robotNamespace>
+        <jointName>propeller_rl_joint</jointName>
+        <linkName>propeller_rl</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>2</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone4</robotNamespace>
+        <jointName>propeller_fl_joint</jointName>
+        <linkName>propeller_fl</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>3</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPowerDistribution" filename="libEspPowerDistribution.so">
+        <robotNamespace>espdrone4</robotNamespace>
+      </plugin>
+      <plugin name="gz::sim::systems::EspAttitudeController" filename="libEspAttitudeController.so">
+        <robotNamespace>espdrone4</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <rollRate_kp>17.8343</rollRate_kp>  <rollRate_ki>0.0</rollRate_ki>  <rollRate_kd>0.5251</rollRate_kd>
+        <pitchRate_kp>17.8343</pitchRate_kp> <pitchRate_ki>0.0</pitchRate_ki> <pitchRate_kd>0.5251</pitchRate_kd>
+        <yawRate_kp>8.9171</yawRate_kp>      <yawRate_ki>0.0</yawRate_ki>     <yawRate_kd>0.2626</yawRate_kd>
+        <roll_kp>6.5417</roll_kp>            <roll_ki>0.0</roll_ki>           <roll_kd>0.2641</roll_kd>
+        <pitch_kp>6.5417</pitch_kp>          <pitch_ki>0.0</pitch_ki>         <pitch_kd>0.2641</pitch_kd>
+        <yaw_kp>3.2708</yaw_kp>              <yaw_ki>0.0</yaw_ki>             <yaw_kd>0.1320</yaw_kd>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPositionController" filename="libEspPositionController.so">
+        <robotNamespace>espdrone4</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <posX_kp>4.1179</posX_kp> <posX_ki>0.7049</posX_ki> <posX_kd>0.5155</posX_kd>
+        <posY_kp>4.1179</posY_kp> <posY_ki>0.7049</posY_ki> <posY_kd>0.5155</posY_kd>
+        <posZ_kp>1.60</posZ_kp>   <posZ_ki>0.50</posZ_ki>   <posZ_kd>0.00</posZ_kd>
+        <velX_kp>35.6977</velX_kp> <velX_ki>1.5104</velX_ki> <velX_kd>1.0162</velX_kd>
+        <velY_kp>35.6977</velY_kp> <velY_ki>1.5104</velY_ki> <velY_kd>1.0162</velY_kd>
+        <velZ_kp>22.0</velZ_kp>    <velZ_ki>15.0</velZ_ki>   <velZ_kd>0.00</velZ_kd>
+      </plugin>
+    </include>
+
+    <!-- ═══════════ ESP-Drone 5 (follower) — x=0.4, y=-0.4 ═══════════ -->
+    <include>
+      <uri>model://espdrone</uri>
+      <name>espdrone5</name>
+      <pose>0.4 -0.4 0.3 0 0 0</pose>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone5</robotNamespace>
+        <jointName>propeller_fr_joint</jointName>
+        <linkName>propeller_fr</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>0</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone5</robotNamespace>
+        <jointName>propeller_rr_joint</jointName>
+        <linkName>propeller_rr</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>1</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone5</robotNamespace>
+        <jointName>propeller_rl_joint</jointName>
+        <linkName>propeller_rl</linkName>
+        <turningDirection>cw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>2</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspMotorModel" filename="libEspMotorModel.so">
+        <robotNamespace>espdrone5</robotNamespace>
+        <jointName>propeller_fl_joint</jointName>
+        <linkName>propeller_fl</linkName>
+        <turningDirection>ccw</turningDirection>
+        <maxRotVelocity>2618</maxRotVelocity>
+        <motorConstant>1.4e-07</motorConstant>
+        <momentConstant>0.005964552</momentConstant>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-07</rollingMomentCoefficient>
+        <timeConstant>0.0125</timeConstant>
+        <hoverPwm>26300</hoverPwm>
+        <actuator_number>3</actuator_number>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPowerDistribution" filename="libEspPowerDistribution.so">
+        <robotNamespace>espdrone5</robotNamespace>
+      </plugin>
+      <plugin name="gz::sim::systems::EspAttitudeController" filename="libEspAttitudeController.so">
+        <robotNamespace>espdrone5</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <rollRate_kp>17.8343</rollRate_kp>  <rollRate_ki>0.0</rollRate_ki>  <rollRate_kd>0.5251</rollRate_kd>
+        <pitchRate_kp>17.8343</pitchRate_kp> <pitchRate_ki>0.0</pitchRate_ki> <pitchRate_kd>0.5251</pitchRate_kd>
+        <yawRate_kp>8.9171</yawRate_kp>      <yawRate_ki>0.0</yawRate_ki>     <yawRate_kd>0.2626</yawRate_kd>
+        <roll_kp>6.5417</roll_kp>            <roll_ki>0.0</roll_ki>           <roll_kd>0.2641</roll_kd>
+        <pitch_kp>6.5417</pitch_kp>          <pitch_ki>0.0</pitch_ki>         <pitch_kd>0.2641</pitch_kd>
+        <yaw_kp>3.2708</yaw_kp>              <yaw_ki>0.0</yaw_ki>             <yaw_kd>0.1320</yaw_kd>
+      </plugin>
+      <plugin name="gz::sim::systems::EspPositionController" filename="libEspPositionController.so">
+        <robotNamespace>espdrone5</robotNamespace>
+        <comLinkName>body</comLinkName>
+        <controlFrequency>500</controlFrequency>
+        <thrustBase>26300</thrustBase>
+        <posX_kp>4.1179</posX_kp> <posX_ki>0.7049</posX_ki> <posX_kd>0.5155</posX_kd>
+        <posY_kp>4.1179</posY_kp> <posY_ki>0.7049</posY_ki> <posY_kd>0.5155</posY_kd>
+        <posZ_kp>1.60</posZ_kp>   <posZ_ki>0.50</posZ_ki>   <posZ_kd>0.00</posZ_kd>
+        <velX_kp>35.6977</velX_kp> <velX_ki>1.5104</velX_ki> <velX_kd>1.0162</velX_kd>
+        <velY_kp>35.6977</velY_kp> <velY_ki>1.5104</velY_ki> <velY_kd>1.0162</velY_kd>
+        <velZ_kp>22.0</velZ_kp>    <velZ_ki>15.0</velZ_ki>   <velZ_kd>0.00</velZ_kd>
+      </plugin>
+    </include>
+
+      <model name="tree_0">
+      <static>true</static>
+      <pose>10.00 0.00 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 0.90 0 0 0</pose>
+          <geometry><cylinder><radius>0.15</radius><length>1.80</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.06 0 0 0</pose>
+          <geometry><sphere><radius>1.10</radius></sphere></geometry>
+          <material><ambient>0.20 0.42 0.20 1</ambient><diffuse>0.20 0.42 0.20 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_1">
+      <static>true</static>
+      <pose>11.97 11.35 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.26 0 0 0</pose>
+          <geometry><cylinder><radius>0.25</radius><length>2.52</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 4.28 0 0 0</pose>
+          <geometry><sphere><radius>1.76</radius></sphere></geometry>
+          <material><ambient>0.26 0.48 0.22 1</ambient><diffuse>0.26 0.48 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_2">
+      <static>true</static>
+      <pose>0.74 13.88 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.02 0 0 0</pose>
+          <geometry><cylinder><radius>0.22</radius><length>2.04</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.47 0 0 0</pose>
+          <geometry><sphere><radius>1.54</radius></sphere></geometry>
+          <material><ambient>0.17 0.37 0.22 1</ambient><diffuse>0.17 0.37 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_3">
+      <static>true</static>
+      <pose>2.51 11.02 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.38 0 0 0</pose>
+          <geometry><cylinder><radius>0.18</radius><length>2.76</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 4.69 0 0 0</pose>
+          <geometry><sphere><radius>1.32</radius></sphere></geometry>
+          <material><ambient>0.20 0.42 0.20 1</ambient><diffuse>0.20 0.42 0.20 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_4">
+      <static>true</static>
+      <pose>-9.07 15.32 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.14 0 0 0</pose>
+          <geometry><cylinder><radius>0.15</radius><length>2.28</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.88 0 0 0</pose>
+          <geometry><sphere><radius>1.10</radius></sphere></geometry>
+          <material><ambient>0.26 0.48 0.22 1</ambient><diffuse>0.26 0.48 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_5">
+      <static>true</static>
+      <pose>-14.62 4.17 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 0.90 0 0 0</pose>
+          <geometry><cylinder><radius>0.25</radius><length>1.80</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.06 0 0 0</pose>
+          <geometry><sphere><radius>1.76</radius></sphere></geometry>
+          <material><ambient>0.17 0.37 0.22 1</ambient><diffuse>0.17 0.37 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_6">
+      <static>true</static>
+      <pose>-11.35 5.47 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.26 0 0 0</pose>
+          <geometry><cylinder><radius>0.22</radius><length>2.52</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 4.28 0 0 0</pose>
+          <geometry><sphere><radius>1.54</radius></sphere></geometry>
+          <material><ambient>0.20 0.42 0.20 1</ambient><diffuse>0.20 0.42 0.20 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_7">
+      <static>true</static>
+      <pose>-9.52 -3.05 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.02 0 0 0</pose>
+          <geometry><cylinder><radius>0.18</radius><length>2.04</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.47 0 0 0</pose>
+          <geometry><sphere><radius>1.32</radius></sphere></geometry>
+          <material><ambient>0.26 0.48 0.22 1</ambient><diffuse>0.26 0.48 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_8">
+      <static>true</static>
+      <pose>-7.94 -14.46 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.38 0 0 0</pose>
+          <geometry><cylinder><radius>0.15</radius><length>2.76</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 4.69 0 0 0</pose>
+          <geometry><sphere><radius>1.10</radius></sphere></geometry>
+          <material><ambient>0.17 0.37 0.22 1</ambient><diffuse>0.17 0.37 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_9">
+      <static>true</static>
+      <pose>-8.67 -10.87 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.14 0 0 0</pose>
+          <geometry><cylinder><radius>0.25</radius><length>2.28</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.88 0 0 0</pose>
+          <geometry><sphere><radius>1.76</radius></sphere></geometry>
+          <material><ambient>0.20 0.42 0.20 1</ambient><diffuse>0.20 0.42 0.20 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_10">
+      <static>true</static>
+      <pose>0.97 -11.26 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 0.90 0 0 0</pose>
+          <geometry><cylinder><radius>0.22</radius><length>1.80</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.06 0 0 0</pose>
+          <geometry><sphere><radius>1.54</radius></sphere></geometry>
+          <material><ambient>0.26 0.48 0.22 1</ambient><diffuse>0.26 0.48 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_11">
+      <static>true</static>
+      <pose>13.31 -11.82 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.26 0 0 0</pose>
+          <geometry><cylinder><radius>0.18</radius><length>2.52</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 4.28 0 0 0</pose>
+          <geometry><sphere><radius>1.32</radius></sphere></geometry>
+          <material><ambient>0.17 0.37 0.22 1</ambient><diffuse>0.17 0.37 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_12">
+      <static>true</static>
+      <pose>9.48 -11.88 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.02 0 0 0</pose>
+          <geometry><cylinder><radius>0.15</radius><length>2.04</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 3.47 0 0 0</pose>
+          <geometry><sphere><radius>1.10</radius></sphere></geometry>
+          <material><ambient>0.20 0.42 0.20 1</ambient><diffuse>0.20 0.42 0.20 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="tree_13">
+      <static>true</static>
+      <pose>12.48 -1.74 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1.38 0 0 0</pose>
+          <geometry><cylinder><radius>0.25</radius><length>2.76</length></cylinder></geometry>
+          <material><ambient>0.36 0.26 0.17 1</ambient><diffuse>0.36 0.26 0.17 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+        <visual name="crown">
+          <pose>0 0 4.69 0 0 0</pose>
+          <geometry><sphere><radius>1.76</radius></sphere></geometry>
+          <material><ambient>0.26 0.48 0.22 1</ambient><diffuse>0.26 0.48 0.22 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_1">
+      <static>true</static>
+      <pose>0.500 0.500 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_2">
+      <static>true</static>
+      <pose>-0.500 0.500 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_3">
+      <static>true</static>
+      <pose>-1.260 -0.350 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_4">
+      <static>true</static>
+      <pose>1.050 -0.940 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_5">
+      <static>true</static>
+      <pose>1.360 -0.350 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_6">
+      <static>true</static>
+      <pose>-0.050 0.600 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_7">
+      <static>true</static>
+      <pose>-0.760 -0.350 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_8">
+      <static>true</static>
+      <pose>0.250 -0.940 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_9">
+      <static>true</static>
+      <pose>0.860 -0.350 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+    <model name="pad_10">
+      <static>true</static>
+      <pose>0.900 0.600 0.002 0 0 0</pose>
+      <link name="link">
+        <visual name="pad">
+          <geometry><cylinder><radius>0.12</radius><length>0.004</length></cylinder></geometry>
+          <material><ambient>0.93 0.93 0.90 1</ambient><diffuse>0.93 0.93 0.90 1</diffuse><specular>0.02 0.02 0.02 1</specular></material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
