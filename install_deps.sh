@@ -25,7 +25,7 @@ $SUDO apt-get update
 
 echo "==> Gazebo Harmonic, compiler and Python packages"
 $SUDO apt-get install -y gz-harmonic build-essential cmake \
-  python3-gz-transport13 python3-gz-msgs10 python3-numpy python3-matplotlib python3-tk
+  python3-gz-transport13 python3-gz-msgs10 python3-numpy python3-scipy python3-matplotlib python3-tk
 
 echo
 echo "Done. Next step: the 'Build' section of README.md."

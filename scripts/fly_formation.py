@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # Copyright 2026 Julio Cesar Rodriguez <contact@juliordz.com>
 # SPDX-License-Identifier: Apache-2.0
-"""Bearing-only formation of ten ESP-drones in Gazebo (CCE 2025).
+"""Bearing-only formation of ESP-drones in Gazebo (CCE 2025).
 
-Drones 1 and 2 are leaders with the velocities of the paper. The other eight
-only use bearings to their neighbors, with the Super-Twisting law (sta) or the
-baseline proportional-derivative law (pd).
+Drones 1 and 2 are leaders with the velocities of the paper. The others only use
+bearings to their neighbors, with the Super-Twisting law (sta) or the baseline
+proportional-derivative law (pd). The formation is the one of the paper, with ten
+drones, or a larger pyramid or set of letters.
 
 The ESP-drone is much smaller than the Bebop 2 of the paper, so positions and
 speeds are multiplied by --scale. Bearings do not change with this scale.
@@ -32,36 +33,31 @@ from gz.msgs10.pose_pb2 import Pose
 from gz.msgs10.pose_v_pb2 import Pose_V
 from gz.msgs10.twist_pb2 import Twist
 from gz.transport13 import Node
+import formations
 import numpy as np
 
 REPO = Path(__file__).resolve().parent.parent
 WORLD = 'espdrone_multi'
-N = 10
 LEADERS = (0, 1)
 DEFAULT_SCALE = 0.5
-TAKEOFF_SEC = 8.0
-LAND_SEC = 8.0
 VELOCITY_FILTER_SEC = 0.05
 MAX_SPEED = 1.0
+TRAVEL_GAIN = 1.0
 NU_LIMIT = 2.0
 
 # Positions of the paper, in meters.
-START = np.array([
-    [1.0, 1.0, 5.0], [-1.0, 1.0, 5.0], [-2.52, -0.7, 5.0], [2.1, -1.88, 5.0], [2.72, -0.7, 5.0],
-    [-0.1, 1.2, 5.0], [-1.52, -0.7, 5.0], [0.5, -1.88, 5.0], [1.72, -0.7, 5.0], [1.8, 1.2, 5.0]])
-TARGET = np.array([
-    [1.0, 1.0, 3.0], [-1.0, 1.0, 3.0], [-1.62, -0.9, 3.0], [0.0, -2.08, 3.0], [1.62, -0.9, 3.0],
-    [-1.0, 1.0, 1.0], [-1.62, -0.9, 1.0], [0.0, -2.08, 1.0], [1.62, -0.9, 1.0], [1.0, 1.0, 1.0]])
-# Observer -> target, numbered as in the paper.
-EDGES = [(3, 2), (3, 4), (4, 5), (4, 1), (4, 2), (5, 4), (5, 1), (5, 10), (6, 10), (6, 1),
-         (6, 8), (7, 10), (7, 6), (7, 8), (7, 2), (8, 10), (8, 9), (8, 7), (8, 6), (8, 3),
-         (9, 10), (9, 1), (9, 2), (10, 7), (10, 8), (10, 6), (10, 5), (10, 9)]
 # Gains per axis (x and y, z), tuned in flight for this drone and scale. The STA law
 # has k0, k1, k2 and the PD law has k0, k1.
 GAINS = {
     'sta': {'xy': (0.40401, 0.30322, 0.00034431), 'z': (0.93109, 0.75493, 0.045843),
             'boundary': 0.0286},
     'pd': {'xy': (0.20042, 1.2183), 'z': (0.716, 2.7416)},
+}
+# The Super-Twisting law needs other gains for the pyramids and letters.
+SHAPE_GAINS = {
+    'sta': {'xy': (0.56989, 0.18632, 0.00013637), 'z': (0.69437, 0.5958, 0.00060545),
+            'boundary': 0.0101},
+    'pd': GAINS['pd'],
 }
 
 
@@ -77,16 +73,15 @@ def leader_velocity(t, leader):
     return np.array([vx, vy, 0.048])
 
 
-def make_world(scale):
-    """Return the path of a world file with ten drones at the scaled start."""
+def make_world(pads):
+    """Return the path of a world file with a drone on each pad."""
     template = (REPO / 'worlds' / 'espdrone_multi.sdf').read_text()
     head, _, rest = template.partition('    <include>')
     drone = '    <include>' + rest.partition('</include>')[0] + '</include>\n'
     tail = rest.rpartition('</include>')[2]
     parts = [head]
-    for i in range(N):
+    for i, (x, y, _) in enumerate(pads):
         block = drone.replace('espdrone1', f'espdrone{i + 1}')
-        x, y = START[i, :2] * scale
         block = block.replace('<pose>0.4 0.4 0.3 0 0 0</pose>', f'<pose>{x} {y} 0.05 0 0 0</pose>')
         parts.append(block)
     parts.append(tail)
@@ -104,10 +99,13 @@ class Formation:
               AUTOMATIC: ('AUTOMATIC', '#1e8449'), LANDING: ('LANDING', '#b9770e'),
               STOPPED: ('EMERGENCY STOP', '#c0392b')}
 
-    def __init__(self, controller, headless, scale, gains=None):
+    def __init__(self, controller, headless, scale, scenario, gains):
         self.controller = controller
         self.scale = scale
-        self.gains = gains or GAINS[controller]
+        self.scenario = scenario
+        N = scenario.size
+        self.size = N
+        self.gains = gains
         self.lock = threading.Lock()
         self.state = self.IDLE
         self.pos = np.full((N, 3), np.nan)
@@ -121,10 +119,12 @@ class Formation:
         self.log = []
         self.steps = 0
         self.running = True
-        desired = TARGET * scale
-        self.edges = [(a - 1, b - 1) for a, b in EDGES]
-        self.g_des = {(a, b): (desired[b] - desired[a]) / np.linalg.norm(desired[b] - desired[a])
-                      for a, b in self.edges}
+        self.edges = scenario.edges
+        edges = np.array(scenario.edges)
+        self.edge_a, self.edge_b = edges[:, 0], edges[:, 1]
+        desired = scenario.target[self.edge_b] - scenario.target[self.edge_a]
+        self.g_des = desired / np.linalg.norm(desired, axis=1, keepdims=True)
+        self.follows = self.edge_a >= len(LEADERS)
         self.node = Node()
         self.pub_pos = [self.node.advertise(f'/espdrone{i + 1}/cmd_position', Pose) for i in range(N)]
         self.pub_vel = [self.node.advertise(f'/espdrone{i + 1}/cmd_vel_world', Twist) for i in range(N)]
@@ -132,7 +132,7 @@ class Formation:
                            for i in range(N)]
         self.names = {f'espdrone{i + 1}': i for i in range(N)}
         self.node.subscribe(Pose_V, f'/world/{WORLD}/pose/info', self._on_poses)
-        self.world_file = make_world(scale)
+        self.world_file = make_world(scenario.pads)
         env = dict(os.environ)
         env['GZ_SIM_RESOURCE_PATH'] = f"{REPO / 'models'}:{env.get('GZ_SIM_RESOURCE_PATH', '')}"
         env['GZ_SIM_SYSTEM_PLUGIN_PATH'] = (
@@ -143,7 +143,7 @@ class Formation:
 
     def _on_poses(self, msg):
         stamp = msg.header.stamp.sec + msg.header.stamp.nsec * 1e-9
-        pos = np.full((N, 3), np.nan)
+        pos = np.full((self.size, 3), np.nan)
         for pose in msg.pose:
             i = self.names.get(pose.name)
             if i is not None:
@@ -159,7 +159,7 @@ class Formation:
             self.last_stamp = stamp
 
     def wait_ready(self, timeout=90.0):
-        deadline = time.time() + timeout
+        deadline = time.time() + timeout + 2.0 * self.size
         while time.time() < deadline:
             with self.lock:
                 if not np.isnan(self.pos).any():
@@ -171,6 +171,7 @@ class Formation:
         with self.lock:
             if state == self.LANDING:
                 self.land_from = self.pos.copy()
+                self.land_goals = formations.landing_goals(self.land_from, self.scenario.pads)
             if state == self.AUTOMATIC:
                 self.nu[:] = 0.0
                 self.cmd[:] = 0.0
@@ -200,31 +201,26 @@ class Formation:
 
     def _bearing_law(self, pos, vel, dt):
         """Acceleration of each follower from its bearings, as in the paper."""
-        accel = np.zeros((N, 3))
-        errors = []
-        for a, b in self.edges:
-            rel = pos[b] - pos[a]
-            dist = np.linalg.norm(rel)
-            if dist < 1e-6:
-                continue
-            g = rel / dist
-            g_rate = (np.eye(3) - np.outer(g, g)) @ (vel[b] - vel[a]) / dist
-            e = g - self.g_des[(a, b)]
-            errors.append(e)
-            if a in LEADERS:
-                continue
-            for axis in range(3):
-                k = self.gains['z' if axis == 2 else 'xy']
-                if self.controller == 'pd':
-                    accel[a, axis] += k[0] * e[axis] + k[1] * g_rate[axis]
-                else:
-                    s = -g_rate[axis] - k[0] * e[axis]
-                    # A smooth sign: the exact one makes a limit cycle with the velocity loop.
-                    sign = math.tanh(s / self.gains['boundary'])
-                    self.nu[a, axis] = np.clip(self.nu[a, axis] - k[2] * sign * dt,
-                                               -NU_LIMIT, NU_LIMIT)
-                    accel[a, axis] += self.nu[a, axis] - k[1] * math.sqrt(abs(s)) * sign
-        return accel, np.array(errors)
+        rel = pos[self.edge_b] - pos[self.edge_a]
+        dist = np.linalg.norm(rel, axis=1, keepdims=True)
+        g = rel / np.maximum(dist, 1e-6)
+        rate = vel[self.edge_b] - vel[self.edge_a]
+        g_rate = (rate - g * np.sum(g * rate, axis=1, keepdims=True)) / np.maximum(dist, 1e-6)
+        errors = g - self.g_des
+        k = np.array([self.gains['xy'], self.gains['xy'], self.gains['z']])
+        a, e, r = self.edge_a[self.follows], errors[self.follows], g_rate[self.follows]
+        accel = np.zeros_like(pos)
+        if self.controller == 'pd':
+            np.add.at(accel, a, k[:, 0] * e + k[:, 1] * r)
+        else:
+            s = -r - k[:, 0] * e
+            # A smooth sign: the exact one makes a limit cycle with the velocity loop.
+            sign = np.tanh(s / self.gains['boundary'])
+            step = np.zeros_like(pos)
+            np.add.at(step, a, -k[:, 2] * sign * dt)
+            self.nu = np.clip(self.nu + step, -NU_LIMIT, NU_LIMIT)
+            np.add.at(accel, a, self.nu[a] - k[:, 1] * np.sqrt(np.abs(s)) * sign)
+        return accel, errors
 
     def step(self):
         with self.lock:
@@ -237,9 +233,13 @@ class Formation:
         if self.steps % 10 == 0:
             self._send_enable()
         if state == self.TAKING_OFF:
-            target = START * self.scale
-            target[:, 2] *= min(1.0, dt_state / TAKEOFF_SEC)
-            self._send_positions(target)
+            point = self.scenario.takeoff_point(dt_state)
+            if 0.0 < self.scenario.climb_sec <= dt_state:
+                # Following a moving position shakes the drones when there are many,
+                # so the way to the formation goes through the velocity loop.
+                self._send_velocities(np.clip(TRAVEL_GAIN * (point - pos), -MAX_SPEED, MAX_SPEED))
+            else:
+                self._send_positions(point)
         elif state == self.AUTOMATIC:
             if self.last_law is None:
                 self.last_law = now
@@ -252,14 +252,15 @@ class Formation:
             for leader in LEADERS:
                 self.cmd[leader] = leader_velocity(dt_state, leader) * self.scale
             self._send_velocities(self.cmd)
-            metric = float(np.sqrt(np.sum(errors ** 2) / (3 * (N - len(LEADERS)))))
+            metric = float(np.sqrt(np.sum(errors ** 2) / (3 * (self.size - len(LEADERS)))))
             self.log.append((dt_state, metric, *pos.ravel()))
         elif state == self.LANDING:
-            s = max(0.0, 1.0 - dt_state / LAND_SEC)
-            target = self.land_from.copy()
-            target[:, 2] *= s
-            self._send_positions(target)
-            if s == 0.0:
+            point = self.scenario.landing_point(dt_state, self.land_from, self.land_goals)
+            if self.scenario.climb_sec > 0.0 and dt_state < self.scenario.travel_sec:
+                self._send_velocities(np.clip(TRAVEL_GAIN * (point - pos), -MAX_SPEED, MAX_SPEED))
+            else:
+                self._send_positions(point)
+            if dt_state >= self.scenario.takeoff_sec:
                 self.set_state(self.IDLE)
 
     def run_commands(self):
@@ -292,32 +293,50 @@ def wait_sim(formation, seconds):
         time.sleep(0.05)
 
 
+def chosen_gains(args):
+    table = GAINS if args.formation == 'paper' else SHAPE_GAINS
+    return json.loads(args.gains) or table[args.controller]
+
+
+def make_scenario(args):
+    if args.formation == 'pyramid':
+        return formations.shape_scenario(formations.pyramid(args.levels, args.spacing), args.spacing)
+    if args.formation == 'letters':
+        return formations.shape_scenario(formations.letters(args.text, args.spacing), args.spacing)
+    return formations.paper_scenario(args.scale)
+
+
 def save_log(formation, output, tag):
     os.makedirs(output, exist_ok=True)
     log = np.array(formation.log)
-    names = [f'{c}{i + 1}' for i in range(N) for c in 'xyz']
+    names = [f'{c}{i + 1}' for i in range(formation.size) for c in 'xyz']
     with open(os.path.join(output, f'{tag}.csv'), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['t', 'e_m'] + names)
         writer.writerows(np.round(log, 5).tolist())
     settled = log[log[:, 0] >= 30.0, 1]
-    return float(settled.min()), float(np.median(settled)), float(settled.max())
+    # After the take-off, every 0.5 s or so. The diagonal does not count.
+    pos = log[::25, 2:].reshape(-1, formation.size, 3)
+    dist = np.linalg.norm(pos[:, :, None] - pos[:, None], axis=3)
+    dist[:, np.arange(formation.size), np.arange(formation.size)] = np.inf
+    return float(settled.min()), float(np.median(settled)), float(settled.max()), float(dist.min())
 
 
 def run_auto(args):
-    formation = Formation(args.controller, args.headless, args.scale, json.loads(args.gains) or None)
+    formation = Formation(args.controller, args.headless, args.scale, make_scenario(args),
+                          chosen_gains(args))
     threading.Thread(target=formation.run_commands, daemon=True).start()
     try:
         if not formation.wait_ready():
             raise RuntimeError('Gazebo did not start. Check that the plugins were built.')
         wait_sim(formation, 1.0)
         formation.set_state(Formation.TAKING_OFF)
-        wait_sim(formation, TAKEOFF_SEC + 3.0)
+        wait_sim(formation, formation.scenario.takeoff_sec + 3.0)
         formation.set_state(Formation.AUTOMATIC)
         wait_sim(formation, args.duration)
-        low, mid, high = save_log(formation, args.output, args.controller)
+        low, mid, high, closest = save_log(formation, args.output, args.controller)
         print(f'{args.controller}: bearing error metric after 30 s: minimum {low:.4f}, '
-              f'median {mid:.4f}, maximum {high:.4f}', flush=True)
+              f'median {mid:.4f}, maximum {high:.4f}, smallest distance {closest:.2f} m', flush=True)
     finally:
         formation.close()
 
@@ -332,7 +351,8 @@ def run_panel(args):
     from matplotlib.figure import Figure
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
-    formation = Formation(args.controller, args.headless, args.scale, json.loads(args.gains) or None)
+    formation = Formation(args.controller, args.headless, args.scale, make_scenario(args),
+                          chosen_gains(args))
     threading.Thread(target=formation.run_commands, daemon=True).start()
 
     root = tk.Tk()
@@ -419,6 +439,11 @@ def main():
     parser.add_argument('--controller', choices=tuple(GAINS), default='sta')
     parser.add_argument('--scale', type=float, default=DEFAULT_SCALE,
                         help='size of the formation and speeds; 1.0 is the size of the paper')
+    parser.add_argument('--formation', choices=('paper', 'pyramid', 'letters'), default='paper')
+    parser.add_argument('--levels', type=int, default=4, help='layers of the pyramid')
+    parser.add_argument('--text', default='CCE', help='letters to form')
+    parser.add_argument('--spacing', type=float, default=1.6,
+                        help='distance between neighbors in a pyramid or letters [m]')
     parser.add_argument('--headless', action='store_true', help='no Gazebo window')
     parser.add_argument('--auto', action='store_true', help='fly without the control panel')
     parser.add_argument('--duration', type=float, default=60.0, help='automatic mode [s]')
