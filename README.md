@@ -6,6 +6,30 @@ Gazebo simulation based on the paper *Bearing-Only Super-Twisting Control for Mu
 
 This repository is based on the simulation of the paper, but it uses another drone and other code. See [Differences from the paper](#differences-from-the-paper).
 
+## How to cite
+
+If you use this code, please cite both the paper and this repository.
+
+```bibtex
+@inproceedings{lopezruiz2025bearing,
+  author    = {López Ruiz, Frida G. and Rodríguez, Julio César and Becerra, Héctor M. and Ruiz León, Javier},
+  title     = {Bearing-Only Super-Twisting Control for Multi-Quadrotor Formations},
+  booktitle = {2025 22nd International Conference on Electrical Engineering, Computing Science and Automatic Control (CCE)},
+  pages     = {1--6},
+  year      = {2025},
+  url       = {https://ieeexplore.ieee.org/document/11272041}
+}
+```
+
+```bibtex
+@software{rodriguez2026cce2025sim,
+  author = {Rodriguez, Julio Cesar},
+  title  = {CCE 2025 Bearing-Only Super-Twisting Simulation},
+  year   = {2026},
+  url    = {https://github.com/juliordzcer/bearing-only-super-twisting}
+}
+```
+
 ## What you need
 
 - A computer with **Ubuntu 24.04**.
@@ -158,30 +182,6 @@ STA has the lower error in all of them, and the difference is smallest with 91 d
 | `models/espdrone` | ESP-drone model |
 | `worlds` | Gazebo world |
 | `scripts` | Bearing-only laws, formations, flight and control panel |
-
-## How to cite
-
-If you use this code, please cite both the paper and this repository.
-
-```bibtex
-@inproceedings{lopezruiz2025bearing,
-  author    = {López Ruiz, Frida G. and Rodríguez, Julio César and Becerra, Héctor M. and Ruiz León, Javier},
-  title     = {Bearing-Only Super-Twisting Control for Multi-Quadrotor Formations},
-  booktitle = {2025 22nd International Conference on Electrical Engineering, Computing Science and Automatic Control (CCE)},
-  pages     = {1--6},
-  year      = {2025},
-  url       = {https://ieeexplore.ieee.org/document/11272041}
-}
-```
-
-```bibtex
-@software{rodriguez2026cce2025sim,
-  author = {Rodriguez, Julio Cesar},
-  title  = {CCE 2025 Bearing-Only Super-Twisting Simulation},
-  year   = {2026},
-  url    = {https://github.com/juliordzcer/bearing-only-super-twisting}
-}
-```
 
 ## License
 
