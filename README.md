@@ -20,8 +20,8 @@ You do not need to know ROS or Python to run it, and ROS is not used. Copy each 
 ```bash
 sudo apt update && sudo apt install -y git
 cd ~
-git clone https://github.com/juliordzcer/cce2025-bearing-only-sta.git
-cd cce2025-bearing-only-sta
+git clone https://github.com/juliordzcer/bearing-only-super-twisting.git
+cd bearing-only-super-twisting
 ```
 
 **2. Install Gazebo and the other dependencies**
@@ -179,7 +179,7 @@ If you use this code, please cite both the paper and this repository.
   author = {Rodriguez, Julio Cesar},
   title  = {CCE 2025 Bearing-Only Super-Twisting Simulation},
   year   = {2026},
-  url    = {https://github.com/juliordzcer/cce2025-bearing-only-sta}
+  url    = {https://github.com/juliordzcer/bearing-only-super-twisting}
 }
 ```
 

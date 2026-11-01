@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this code, please cite both the paper and this repository."
 title: "CCE 2025 Bearing-Only Super-Twisting Simulation"
 type: software
-repository-code: "https://github.com/juliordzcer/cce2025-bearing-only-sta"
+repository-code: "https://github.com/juliordzcer/bearing-only-super-twisting"
 license: Apache-2.0
 authors:
   - family-names: "Rodriguez"
