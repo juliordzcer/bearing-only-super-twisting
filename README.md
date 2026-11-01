@@ -137,10 +137,6 @@ STA has the lower error in all of them, and the difference is smallest with 91 d
 | Gains | Table of the paper | Tuned in flight for this drone and scale |
 | Simulator | Gazebo Ionic and ROS Rolling | Gazebo Harmonic, without ROS |
 
-## TODO
-
-- Add the Parrot Bebop 2 version, to compare directly with the paper.
-
 ## Known limitations
 
 - **Flights at the same time.** Simulations on one computer interfere with each other, and drones can stay on the ground. To run several at once, give each its own `GZ_PARTITION`, `GZ_DISCOVERY_MSG_PORT` and `GZ_DISCOVERY_SRV_PORT`.
